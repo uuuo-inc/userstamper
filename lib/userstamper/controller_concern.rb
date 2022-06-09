@@ -7,22 +7,29 @@
 module Userstamper::ControllerConcern
   extend ActiveSupport::Concern
 
-  included do
-    around_action :with_stamper
-  end
+  # included do
+  #  around_action :with_stamper
+  # end
 
-  private
+  # private
 
   # This {#with_stamper} method sets the stamper for the duration of the action. This ensures
   # that exceptions raised within the controller action would properly restore the previous stamper.
   #
   # TODO: Remove set_stamper/reset_stamper
+  def set_stamping_user(user)
+    @stamping_user = user
+    printf("<<<< userstamper@local set_stamping_user >>>> %s >>>> \n", @stamping_user)
+  end
+
   def with_stamper
     set_stamper
     yield
   ensure
     reset_stamper
   end
+
+  private
 
   # The {#set_stamper} method as implemented here assumes a couple of things. First, that you are
   # using a +User+ model as the stamper and second that your controller has a +current_user+
@@ -31,7 +38,8 @@ module Userstamper::ControllerConcern
   # private section of your +ApplicationController+
   def set_stamper
     @_userstamp_stamper = Userstamper.config.default_stamper_class.stamper
-    Userstamper.config.default_stamper_class.stamper = current_user
+    Userstamper.config.default_stamper_class.stamper = @stamping_user # current_user
+    printf("<<<< userstamper@local set_stamper >>>> %s >>>> \n", Userstamper.config.default_stamper_class.stamper)
   end
 
   # The {#reset_stamper} method as implemented here assumes that a +User+ model is being used as
@@ -40,5 +48,6 @@ module Userstamper::ControllerConcern
   def reset_stamper
     Userstamper.config.default_stamper_class.stamper = @_userstamp_stamper
     @_userstamp_stamper = nil
+    printf("<<<< userstamper@local reset_stamper >>>> %s >>>> \n", Userstamper.config.default_stamper_class.stamper)
   end
 end
