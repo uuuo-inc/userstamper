@@ -19,7 +19,6 @@ module Userstamper::ControllerConcern
   # TODO: Remove set_stamper/reset_stamper
   def set_stamping_user(user)
     @stamping_user = user
-    printf("<<<< userstamper@local set_stamping_user >>>> %s >>>> \n", @stamping_user)
   end
 
   def with_stamper
@@ -39,7 +38,6 @@ module Userstamper::ControllerConcern
   def set_stamper
     @_userstamp_stamper = Userstamper.config.default_stamper_class.stamper
     Userstamper.config.default_stamper_class.stamper = @stamping_user # current_user
-    printf("<<<< userstamper@local set_stamper >>>> %s >>>> \n", Userstamper.config.default_stamper_class.stamper)
   end
 
   # The {#reset_stamper} method as implemented here assumes that a +User+ model is being used as
@@ -48,6 +46,5 @@ module Userstamper::ControllerConcern
   def reset_stamper
     Userstamper.config.default_stamper_class.stamper = @_userstamp_stamper
     @_userstamp_stamper = nil
-    printf("<<<< userstamper@local reset_stamper >>>> %s >>>> \n", Userstamper.config.default_stamper_class.stamper)
   end
 end
