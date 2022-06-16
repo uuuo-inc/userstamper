@@ -7,20 +7,25 @@
 module Userstamper::ControllerConcern
   extend ActiveSupport::Concern
 
+  # RE-IMPLED <<<
+  # The `around_action`, `with_stamper` and `set_stamping_user` are added in our controller which
+  # includes this concern module. Instead of `current_user`, the `set_stamping_user` can be given
+  # a user roled as stamper.
+  def set_stamping_user(user)
+    @stamping_user = user
+  end
+
   # included do
   #  around_action :with_stamper
   # end
 
   # private
+  # RE-IMPLED >>>
 
   # This {#with_stamper} method sets the stamper for the duration of the action. This ensures
   # that exceptions raised within the controller action would properly restore the previous stamper.
   #
   # TODO: Remove set_stamper/reset_stamper
-  def set_stamping_user(user)
-    @stamping_user = user
-  end
-
   def with_stamper
     set_stamper
     yield
@@ -37,7 +42,7 @@ module Userstamper::ControllerConcern
   # private section of your +ApplicationController+
   def set_stamper
     @_userstamp_stamper = Userstamper.config.default_stamper_class.stamper
-    Userstamper.config.default_stamper_class.stamper = @stamping_user # current_user
+    Userstamper.config.default_stamper_class.stamper = @stamping_user
   end
 
   # The {#reset_stamper} method as implemented here assumes that a +User+ model is being used as
